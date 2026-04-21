@@ -11,7 +11,6 @@ export function useRadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryTimerRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef(0);
-  const switchingStationRef = useRef(false);
 
   const [activeStation, setActiveStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -89,25 +88,11 @@ export function useRadioPlayer() {
   const playStation = useCallback((station: RadioStation) => {
     console.log('[Radio] Playing station:', station.name, station.url);
     
-    // Prevent multiple rapid switches
-    if (switchingStationRef.current) {
-      console.log('[Radio] Already switching stations, ignoring...');
-      return;
-    }
-
-    const isStationSwitch = audioRef.current !== null && activeStation !== null;
-    
     // IMPORTANT: Cleanup previous audio completely before starting new one
-    if (isStationSwitch) {
-      console.log('[Radio] Switching stations - stopping current first');
-      switchingStationRef.current = true;
-      cleanupAudio();
-    } else {
-      cleanupAudio();
-    }
-
+    cleanupAudio();
+    
     setActiveStation(station);
-    setIsPlaying(false); // Set to false initially during switch
+    setIsPlaying(true);
     setIsBuffering(true);
     setHasError(false);
     setErrorMessage(null);
@@ -115,7 +100,6 @@ export function useRadioPlayer() {
 
     // Small delay to ensure cleanup is complete
     setTimeout(() => {
-      switchingStationRef.current = false;
       // Create new audio element
       const audio = new Audio();
       audio.preload = 'metadata';
@@ -235,7 +219,7 @@ export function useRadioPlayer() {
           setIsPlaying(false);
         });
       }
-    }, isStationSwitch ? 2000 : 100); // 2 second delay when switching stations, 100ms for initial play
+    }, 100); // 100ms delay for cleanup
   }, [volume, cleanupAudio, getErrorMessage]);
 
   // Stop playback
