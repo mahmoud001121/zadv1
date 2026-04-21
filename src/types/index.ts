@@ -82,6 +82,7 @@ export interface Dhikr {
   description: string;
   reference: string;
   content: string;
+  fadl?: string;
 }
 
 // ===== Hadith Types =====
