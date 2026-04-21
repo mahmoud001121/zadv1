@@ -21,11 +21,14 @@
   - Free tier: No credit card required
   - No database setup needed
   - Set env vars: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`
-  - Optional: Use cron-job.org to keep server awake
+  - **Important**: Vercel free tier doesn't support frequent cron jobs
+  - Use external cron service (cron-job.org) to ping `/api/push/cron` every minute
+  - This keeps server awake and notifications working 24/7
 
 ## Notes
 - No test suite configured (no test script in package.json)
 - Notifications work offline via Service Worker
 - TypeScript errors ignored in build (`ignoreBuildErrors: true`)
-- Cron job configured in `vercel.json` for push notifications
+- No cron job in `vercel.json` (Vercel free tier limitation)
 - Push subscriptions reset when server restarts (Vercel free tier sleeps after 15 min)
+- External cron service required for 24/7 notifications

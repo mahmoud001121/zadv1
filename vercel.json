@@ -19,11 +19,5 @@
         { "key": "Service-Worker-Allowed", "value": "/" }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/push/cron",
-      "schedule": "* * * * *"
-    }
   ]
 }

@@ -41,9 +41,20 @@ mailto:zad-muslim@app.com
 
 5. Click Deploy
 
-### Step 3: Done!
+### Step 3: Setup External Cron (5 Minutes)
 
-Your app is live at `https://your-app.vercel.app`
+**Important:** Vercel free tier doesn't support frequent cron jobs.
+
+Use **cron-job.org** (free, no credit card):
+
+1. Go to https://cron-job.org
+2. Sign up (free)
+3. Create new cron job:
+   - **URL**: `https://your-app.vercel.app/api/push/cron`
+   - **Schedule**: Every 1 minute
+4. Save
+
+This keeps your server awake and notifications working 24/7!
 
 ---
 
@@ -56,8 +67,8 @@ Your app is live at `https://your-app.vercel.app`
 
 **Push Notifications:**
 - Subscriptions stored in server memory
-- If server restarts (Vercel free tier sleeps after 15 min), users just re-allow notifications
-- Optional: Use cron-job.org to keep server awake (see VERCEL_DEPLOYMENT.md)
+- External cron (cron-job.org) pings server every minute
+- Keeps server awake and notifications working 24/7
 
 ---
 

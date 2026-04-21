@@ -92,12 +92,53 @@ production
 4. Test prayer times
 5. Test notifications
 
-### Important Notes
+### Important Notes About Notifications
 
-- **Notifications**: Users need to allow notifications each time the server restarts (Vercel free tier restarts after 15 min inactivity)
-- **Goals/Tasks**: Saved in browser, persist across visits
-- **Settings**: Saved in browser, persist across visits
-- **No database needed**: Everything works client-side
+**How Notifications Work:**
+- Push subscriptions are stored in server memory
+- Vercel free tier puts server to sleep after ~15 minutes of inactivity
+- When server wakes up, subscriptions are lost
+- Users just need to revisit the site and allow notifications again
+
+**To Keep Notifications Working 24/7:**
+
+Use a free external cron service to ping your API every minute:
+
+#### Option 1: Cron-Job.org (Recommended)
+
+1. Go to https://cron-job.org
+2. Sign up (free, no credit card)
+3. Create new cron job:
+   - **Title**: Zad Muslim Notifications
+   - **URL**: `https://your-app.vercel.app/api/push/cron`
+   - **Schedule**: Every 1 minute
+   - **Method**: GET
+4. Save and enable
+
+#### Option 2: EasyCron.com
+
+1. Go to https://www.easycron.com
+2. Sign up (free tier: 100 executions/day)
+3. Create cron job:
+   - **URL**: `https://your-app.vercel.app/api/push/cron`
+   - **Cron Expression**: `* * * * *` (every minute)
+4. Save
+
+#### Option 3: UptimeRobot.com
+
+1. Go to https://uptimerobot.com
+2. Sign up (free)
+3. Add new monitor:
+   - **Monitor Type**: HTTP(s)
+   - **URL**: `https://your-app.vercel.app/api/push/cron`
+   - **Monitoring Interval**: 5 minutes (free tier limit)
+4. Create monitor
+
+**With external cron:**
+- ✅ Server stays awake 24/7
+- ✅ Notifications work continuously
+- ✅ Users don't need to re-allow notifications
+- ✅ 100% free
 
 ### Custom Domain (Optional)
 
@@ -135,31 +176,14 @@ Check Vercel build logs. Common issues:
 - Check all VAPID environment variables are set
 - Make sure user allowed notifications in browser
 - If server restarted, user needs to allow notifications again
+- **Solution**: Set up external cron service (see above)
 
 ### Notifications Stop After 15 Minutes?
 
 This is normal on Vercel free tier:
 - Server goes to sleep after 15 min inactivity
 - Push subscriptions are stored in-memory
-- Users just need to revisit the site and allow notifications again
-- **Solution**: Use an uptime monitor (see below)
-
----
-
-## 🔥 Keep Server Awake (Optional)
-
-To prevent the 15-minute sleep on Vercel free tier:
-
-### Use Cron-Job.org (Free)
-
-1. Go to https://cron-job.org
-2. Sign up (free, no credit card)
-3. Create new cron job:
-   - URL: `https://your-app.vercel.app/api/push/cron`
-   - Schedule: Every 5 minutes
-   - Title: Keep Zad Muslim Awake
-
-This keeps your server warm and notifications working 24/7.
+- **Solution**: Use external cron service like cron-job.org to ping `/api/push/cron` every minute
 
 ---
 
@@ -179,9 +203,9 @@ Update the VAPID environment variables in Vercel with your new keys.
 
 After deployment:
 - ✅ Prayer times with auto-location
-- ✅ Adhan notifications
-- ✅ Prayer reminders
-- ✅ Salawat reminders
+- ✅ Adhan notifications (with external cron)
+- ✅ Prayer reminders (with external cron)
+- ✅ Salawat reminders (with external cron)
 - ✅ Quran reader
 - ✅ Hadith collections
 - ✅ Azkar
@@ -198,6 +222,7 @@ After deployment:
 
 **Forever Free:**
 - Vercel: Hobby plan (100GB bandwidth/month)
+- Cron-Job.org: Free unlimited cron jobs
 - No database costs
 - No credit card required!
 
@@ -209,8 +234,8 @@ Your Muslim PWA app is now live on Vercel!
 
 **Next Steps:**
 1. Test all features
-2. Share your URL
-3. Add custom domain (optional)
-4. Set up cron-job.org to keep server awake (optional)
+2. Set up external cron service (cron-job.org) for 24/7 notifications
+3. Share your URL
+4. Add custom domain (optional)
 
 Need help? Check Vercel docs! 🚀
