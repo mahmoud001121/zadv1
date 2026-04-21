@@ -6,7 +6,7 @@ const HADITH_API = 'https://hadis-api-id.vercel.app/hadith';
 
 // Load fallback data dynamically to avoid slow compilation
 let fallbackData: any[] | null = null;
-async function getFallbackData() {
+async function getFallbackData(): Promise<any[]> {
   if (!fallbackData) {
     try {
       const filePath = join(process.cwd(), 'src/data/bukhari-150.json');
@@ -23,7 +23,7 @@ async function getFallbackData() {
       }];
     }
   }
-  return fallbackData;
+  return fallbackData || [];
 }
 
 const HADITH_COLLECTIONS = [
