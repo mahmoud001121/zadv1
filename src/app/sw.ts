@@ -1,7 +1,6 @@
 // @ts-nocheck
-import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { Serwist, NetworkFirst, CacheFirst } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -16,8 +15,74 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,
+      handler: new CacheFirst({
+        cacheName: "google-fonts-webfonts",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,
+      handler: new CacheFirst({
+        cacheName: "google-fonts-stylesheets",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,
+      handler: new CacheFirst({
+        cacheName: "static-font-assets",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
+      handler: new CacheFirst({
+        cacheName: "static-image-assets",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\/_next\/image\?url=.+$/i,
+      handler: new NetworkFirst({
+        cacheName: "next-image",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\.(?:mp3|wav|ogg)$/i,
+      handler: new CacheFirst({
+        cacheName: "static-audio-assets",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\.(?:js)$/i,
+      handler: new NetworkFirst({
+        cacheName: "static-js-assets",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\.(?:css|less)$/i,
+      handler: new NetworkFirst({
+        cacheName: "static-style-assets",
+        plugins: [],
+      }),
+    },
+    {
+      urlPattern: /\/_next\/data\/.+\/.+\.json$/i,
+      handler: new NetworkFirst({
+        cacheName: "next-data",
+        plugins: [],
+      }),
+    },
+  ],
 });
+
+serwist.addEventListeners();
 
 serwist.addEventListeners();
 

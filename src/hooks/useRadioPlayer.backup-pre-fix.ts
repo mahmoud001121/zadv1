@@ -11,8 +11,7 @@ export function useRadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryTimerRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef(0);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const eventListenersRef = useRef<Map<string, EventListener>>(new Map());
+  const switchingStationRef = useRef(false);
 
   const [activeStation, setActiveStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -60,15 +59,9 @@ export function useRadioPlayer() {
     }
   }, []);
 
-  // Cleanup audio - IMPROVED with synchronous cleanup
+  // Cleanup audio - IMPROVED
   const cleanupAudio = useCallback(() => {
     console.log('[Radio] Cleaning up audio');
-    
-    // Abort any pending operations
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
     
     // Clear retry timer
     if (retryTimerRef.current) {
@@ -76,30 +69,19 @@ export function useRadioPlayer() {
       retryTimerRef.current = null;
     }
     
-    // Cleanup audio element
+    // Stop and cleanup audio element
     if (audioRef.current) {
-      const audio = audioRef.current;
-      
-      // Remove all event listeners explicitly
-      eventListenersRef.current.forEach((listener, event) => {
-        audio.removeEventListener(event, listener);
-      });
-      eventListenersRef.current.clear();
-      
-      // Stop and reset audio
       try {
-        audio.pause();
-        audio.src = '';
-        audio.load();
+        // Remove all event listeners first
+        audioRef.current.pause();
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
+        audioRef.current = null;
       } catch (e) {
         console.warn('[Radio] Cleanup error:', e);
       }
-      
-      // Nullify reference
-      audioRef.current = null;
     }
     
-    // Reset retry count
     retryCountRef.current = 0;
   }, []);
 
@@ -107,30 +89,33 @@ export function useRadioPlayer() {
   const playStation = useCallback((station: RadioStation) => {
     console.log('[Radio] Playing station:', station.name, station.url);
     
-    // Create new AbortController for this operation
-    abortControllerRef.current?.abort();
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
-    
-    // Cleanup previous audio synchronously
-    cleanupAudio();
+    // Prevent multiple rapid switches
+    if (switchingStationRef.current) {
+      console.log('[Radio] Already switching stations, ignoring...');
+      return;
+    }
 
-    // Set state immediately
+    const isStationSwitch = audioRef.current !== null && activeStation !== null;
+    
+    // IMPORTANT: Cleanup previous audio completely before starting new one
+    if (isStationSwitch) {
+      console.log('[Radio] Switching stations - stopping current first');
+      switchingStationRef.current = true;
+      cleanupAudio();
+    } else {
+      cleanupAudio();
+    }
+
     setActiveStation(station);
-    setIsPlaying(false);
+    setIsPlaying(false); // Set to false initially during switch
     setIsBuffering(true);
     setHasError(false);
     setErrorMessage(null);
     retryCountRef.current = 0;
 
-    // Minimal delay for browser cleanup (50ms)
+    // Small delay to ensure cleanup is complete
     setTimeout(() => {
-      // Check if operation was aborted
-      if (signal.aborted) {
-        console.log('[Radio] Operation aborted');
-        return;
-      }
-
+      switchingStationRef.current = false;
       // Create new audio element
       const audio = new Audio();
       audio.preload = 'metadata';
@@ -163,8 +148,6 @@ export function useRadioPlayer() {
       };
 
       const handleError = (e: Event) => {
-        if (signal.aborted) return; // Don't handle errors for aborted operations
-        
         const audio = e.target as HTMLAudioElement;
         const error = audio.error;
         
@@ -187,7 +170,7 @@ export function useRadioPlayer() {
           console.log(`[Radio] Retrying (${retryCountRef.current}/${MAX_RETRIES})...`);
           
           retryTimerRef.current = setTimeout(() => {
-            if (audioRef.current && !signal.aborted) {
+            if (audioRef.current) {
               audioRef.current.src = '';
               audioRef.current.src = station.url;
               audioRef.current.load();
@@ -209,21 +192,12 @@ export function useRadioPlayer() {
       const handleEnded = () => {
         console.log('[Radio] Stream ended');
         // Auto-restart if stream ends unexpectedly
-        if (audioRef.current && !signal.aborted) {
+        if (audioRef.current) {
           audioRef.current.play().catch((err) => {
             console.error('[Radio] Auto-restart failed:', err);
           });
         }
       };
-
-      // Store event listeners for cleanup
-      eventListenersRef.current.set('canplay', handleCanPlay);
-      eventListenersRef.current.set('playing', handlePlaying);
-      eventListenersRef.current.set('waiting', handleWaiting);
-      eventListenersRef.current.set('loadstart', handleLoadStart);
-      eventListenersRef.current.set('error', handleError);
-      eventListenersRef.current.set('stalled', handleStalled);
-      eventListenersRef.current.set('ended', handleEnded);
 
       // Attach event listeners
       audio.addEventListener('canplay', handleCanPlay);
@@ -242,8 +216,6 @@ export function useRadioPlayer() {
       
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
-          if (signal.aborted) return; // Don't handle errors for aborted operations
-          
           console.error('[Radio] Play failed:', err);
           
           if (err.name === 'NotAllowedError') {
@@ -263,7 +235,7 @@ export function useRadioPlayer() {
           setIsPlaying(false);
         });
       }
-    }, 50); // Reduced from 2000ms/100ms to 50ms
+    }, isStationSwitch ? 2000 : 100); // 2 second delay when switching stations, 100ms for initial play
   }, [volume, cleanupAudio, getErrorMessage]);
 
   // Stop playback
@@ -297,10 +269,6 @@ export function useRadioPlayer() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Abort any pending operations
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
       cleanupAudio();
     };
   }, [cleanupAudio]);
