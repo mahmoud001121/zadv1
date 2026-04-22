@@ -796,7 +796,6 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
                         onSelect={(v) => updateSettings({ salawatInterval: v as number })}
                       />
                     </SettingCard>
-                  )}
               </motion.div>
             )}
           </AnimatePresence>
