@@ -289,7 +289,7 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
     } catch (e) {
       console.warn('Failed to save section states', e);
     }
-  }, [locationExpanded, languageExpanded, prayerExpanded, notificationsExpanded, displayExpanded, quranExpanded]);
+  }, [locationExpanded, languageExpanded, prayerExpanded, notificationsExpanded, quranExpanded]);
 
   // Auto-update push subscription when notification settings change
   useEffect(() => {
