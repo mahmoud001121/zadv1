@@ -7,6 +7,7 @@ interface PushState {
   supported: boolean;
   permission: NotificationPermission;
   subscribed: boolean;
+  error?: string;
   loading: boolean;
 }
 
@@ -51,7 +52,12 @@ export function usePushNotifications() {
         checkSubscription(reg);
       })
       .catch((err) => {
-        console.log('[Push] SW registration failed:', err.message);
+        console.error('[Push] SW registration failed:', err.message, err);
+        setState((prev) => ({ 
+          ...prev, 
+          supported: false,
+          error: 'Service worker registration failed. Please check your connection.'
+        }));
       });
   }, []);
 
