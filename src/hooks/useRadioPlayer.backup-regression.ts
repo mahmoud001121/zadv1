@@ -64,6 +64,12 @@ export function useRadioPlayer() {
   const cleanupAudio = useCallback(() => {
     console.log('[Radio] Cleaning up audio');
     
+    // Abort any pending operations
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    
     // Clear retry timer
     if (retryTimerRef.current) {
       clearTimeout(retryTimerRef.current);
@@ -101,17 +107,13 @@ export function useRadioPlayer() {
   const playStation = useCallback((station: RadioStation) => {
     console.log('[Radio] Playing station:', station.name, station.url);
     
-    // Abort old controller if exists (before cleanup)
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    // Create new AbortController for this operation
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
     
     // Cleanup previous audio synchronously
     cleanupAudio();
-
-    // Create NEW AbortController AFTER cleanup (prevents self-abort)
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
 
     // Set state immediately
     setActiveStation(station);
