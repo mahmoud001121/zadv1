@@ -209,10 +209,10 @@ function ToggleSwitch({
         }`}
         style={{ left: enabled ? 'calc(50% + 2px)' : '4px' }}
       />
-      <span className={`relative z-10 flex-1 text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${!enabled ? 'text-text-primary' : 'text-text-muted'}`}>
+      <span className={`relative z-10 flex-1 text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${enabled ? 'text-text-muted' : 'text-text-primary'}`}>
         {inactiveLabel}
       </span>
-      <span className={`relative z-10 flex-1 text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${enabled ? 'text-black' : 'text-text-muted'}`}>
+      <span className={`relative z-10 flex-1 text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${enabled ? 'text-text-primary' : 'text-text-muted'}`}>
         {activeLabel}
       </span>
     </button>
@@ -225,7 +225,7 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
   const { 
     language, theme, prayerMethod, madhab, reciterId, quranFontSize, 
     salawatEnabled, salawatInterval, prayerReminderEnabled, prayerReminderMinutes, 
-    adhanEnabled, adhanSound, eyeComfort, updateSettings, resetSettings, locationName, setLocation
+    adhanEnabled, adhanSound, updateSettings, resetSettings, locationName, setLocation
   } = useSettingsStore();
 
   const { subscribed, loading: pushLoading, subscribe, unsubscribe, updateSubscription } = usePushNotifications();
@@ -244,7 +244,6 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
   const [languageExpanded, setLanguageExpanded] = useState(true);
   const [prayerExpanded, setPrayerExpanded] = useState(true);
   const [notificationsExpanded, setNotificationsExpanded] = useState(true);
-  const [displayExpanded, setDisplayExpanded] = useState(true);
   const [quranExpanded, setQuranExpanded] = useState(true);
 
   const t = TRANSLATIONS[language];
@@ -271,7 +270,6 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
         setLanguageExpanded(parsed.language ?? true);
         setPrayerExpanded(parsed.prayer ?? true);
         setNotificationsExpanded(parsed.notifications ?? true);
-        setDisplayExpanded(parsed.display ?? true);
         setQuranExpanded(parsed.quran ?? true);
       }
     } catch (e) {
@@ -286,7 +284,6 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
         language: languageExpanded,
         prayer: prayerExpanded,
         notifications: notificationsExpanded,
-        display: displayExpanded,
         quran: quranExpanded,
       }));
     } catch (e) {
@@ -760,45 +757,6 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
                       />
                     </SettingCard>
                   )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Display Settings */}
-        <section>
-          <button 
-            onClick={() => setDisplayExpanded(!displayExpanded)}
-            className="w-full flex items-center justify-between mb-4 group"
-          >
-            <div className="flex-1">
-              <SectionHeader icon={<Moon className="w-5 h-5" />} title={isAr ? 'العرض' : 'Display'} lang={language} />
-            </div>
-            <ChevronDown className={`w-5 h-5 text-text-muted transition-transform duration-200 group-hover:text-zad-gold ${displayExpanded ? 'rotate-180' : ''}`} />
-          </button>
-          
-          <AnimatePresence>
-            {displayExpanded && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden"
-              >
-                <div className="space-y-3">
-                  <SettingCard index={6.5} lang={language}>
-                    <div className={`flex items-center gap-3 ${isAr ? 'flex-row-reverse' : ''}`}>
-                      <div className="w-10 h-10 rounded-xl bg-zad-gold/15 border border-zad-gold/30 flex items-center justify-center">
-                        <Sun className="w-5 h-5 text-zad-gold" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-text-primary">{(t as any).eyeComfort || (isAr ? 'وضع حماية العين' : 'Eye Comfort')}</p>
-                      </div>
-                    </div>
-                    <ToggleSwitch enabled={eyeComfort} onToggle={() => updateSettings({ eyeComfort: !eyeComfort })} activeLabel="ON" inactiveLabel="OFF" />
-                  </SettingCard>
                 </div>
               </motion.div>
             )}

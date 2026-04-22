@@ -32,7 +32,7 @@ export function AzkarList({ category, onBack }: AzkarListProps) {
   useEffect(() => {
     const initial = new Map<number, number>();
     items.forEach((item, index) => {
-      const itemId = item.id ?? index;
+      const itemId = item.id !== undefined ? item.id : index;
       initial.set(itemId, item.count);
     });
     setCounters(initial);
@@ -42,8 +42,8 @@ export function AzkarList({ category, onBack }: AzkarListProps) {
     e.stopPropagation();
     setCounters((prev) => {
       const next = new Map(prev);
-      const current = next.get(id) ?? 0;
-      if (current > 0) {
+      const current = next.get(id);
+      if (current !== undefined && current > 0) {
         next.set(id, current - 1);
       }
       return next;
@@ -100,7 +100,7 @@ export function AzkarList({ category, onBack }: AzkarListProps) {
       {/* Azkar Cards */}
       <div className="mx-auto w-full max-w-2xl space-y-6 p-4 pb-8">
         {items.map((item, i) => {
-          const itemId = item.id ?? i;
+          const itemId = item.id !== undefined ? item.id : i;
           const currentCount = counters.get(itemId) ?? item.count;
           const isCompleted = currentCount === 0;
           const progress = ((item.count - currentCount) / item.count) * 100;
