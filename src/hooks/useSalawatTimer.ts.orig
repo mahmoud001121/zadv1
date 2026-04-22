@@ -18,17 +18,13 @@ export function useSalawatTimer() {
 
     // Log for debugging
     audio.addEventListener('canplaythrough', () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[SalawatTimer] Audio loaded and ready');
-      }
+      console.log('[SalawatTimer] Audio loaded and ready');
     });
     audio.addEventListener('error', (e) => {
       console.error('[SalawatTimer] Audio error:', e);
     });
     audio.addEventListener('playing', () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[SalawatTimer] ▶ Playing salawat');
-      }
+      console.log('[SalawatTimer] ▶ Playing salawat');
     });
 
     return () => {
@@ -45,17 +41,13 @@ export function useSalawatTimer() {
       return;
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[SalawatTimer] playSalawat() called, currentSrc:', audio.currentSrc);
-    }
+    console.log('[SalawatTimer] playSalawat() called, currentSrc:', audio.currentSrc);
     audio.currentTime = 0;
 
     const playPromise = audio.play();
     if (playPromise) {
       playPromise.then(() => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[SalawatTimer] ✓ play() succeeded');
-        }
+        console.log('[SalawatTimer] ✓ play() succeeded');
         setPlayCount(c => c + 1);
       }).catch((err) => {
         console.warn('[SalawatTimer] ✗ play() rejected:', err.message);
@@ -71,17 +63,13 @@ export function useSalawatTimer() {
     }
 
     if (salawatEnabled && isLoaded) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[SalawatTimer] Starting interval: every ${salawatInterval} min`);
-      }
+      console.log(`[SalawatTimer] Starting interval: every ${salawatInterval} min`);
 
       // Request notification permission in background
       if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission()
           .then((permission) => {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('[SalawatTimer] Notification permission:', permission);
-            }
+            console.log('[SalawatTimer] Notification permission:', permission);
           })
           .catch(() => {
             // Silently ignored - user denied or not supported
@@ -90,9 +78,7 @@ export function useSalawatTimer() {
 
       timerRef.current = setInterval(playSalawat, salawatInterval * 60 * 1000);
     } else {
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[SalawatTimer] Timer off (enabled=${salawatEnabled}, loaded=${isLoaded})`);
-      }
+      console.log(`[SalawatTimer] Timer off (enabled=${salawatEnabled}, loaded=${isLoaded})`);
     }
 
     return () => {
