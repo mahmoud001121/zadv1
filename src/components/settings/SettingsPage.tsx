@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useSettingsStore } from '@/store/settings-store';
-import { TRANSLATIONS, RECITERS, PRAYER_METHODS, MADHAB_OPTIONS, ADHAN_SOUNDS } from '@/lib/constants';
+import { TRANSLATIONS, RECITERS, PRAYER_METHODS, MADHAB_OPTIONS, ADHAN_SOUNDS, SALAWAT_INTERVALS } from '@/lib/constants';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useGeolocation } from '@/hooks/useGeolocation';
 
@@ -757,7 +757,46 @@ export default function SettingsPage({ onBack }: { onBack?: () => void }) {
                       />
                     </SettingCard>
                   )}
-                </div>
+
+                  {/* Salawat Sound Toggle */}
+                  <SettingCard index={7} lang={language}>
+                    <div className={`flex items-center gap-3 ${isAr ? 'flex-row-reverse' : ''}`}>
+                      <div className="w-10 h-10 rounded-xl bg-zad-gold/15 border border-zad-gold/30 flex items-center justify-center">
+                        <Volume2 className="w-5 h-5 text-zad-gold" />
+                      </div>
+                      <div className={`flex-1 ${isAr ? 'text-right' : 'text-left'}`}>
+                        <p className="text-sm font-semibold text-text-primary">{t.salawatSound}</p>
+                        <p className="text-xs text-text-muted">{t.salawatIntervalDesc}</p>
+                      </div>
+                    </div>
+                    <ToggleSwitch 
+                      enabled={salawatEnabled} 
+                      onToggle={() => updateSettings({ salawatEnabled: !salawatEnabled })} 
+                      activeLabel="ON" 
+                      inactiveLabel="OFF" 
+                    />
+                  </SettingCard>
+
+                  {/* Salawat Interval Selector - shown only when enabled */}
+                  {salawatEnabled && (
+                    <SettingCard index={8} lang={language}>
+                      <div className={`flex items-center gap-3 ${isAr ? 'flex-row-reverse' : ''}`}>
+                        <div className="w-10 h-10 rounded-xl bg-zad-gold/15 border border-zad-gold/30 flex items-center justify-center">
+                          <Clock className="w-5 h-5 text-zad-gold" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-text-primary">{t.salawatInterval}</p>
+                        </div>
+                      </div>
+                      <SelectionDrawer
+                        label={t.chooseSalawatInterval}
+                        value={salawatInterval}
+                        options={SALAWAT_INTERVALS}
+                        lang={language}
+                        onSelect={(v) => updateSettings({ salawatInterval: v as number })}
+                      />
+                    </SettingCard>
+                  )}
               </motion.div>
             )}
           </AnimatePresence>
