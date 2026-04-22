@@ -51,7 +51,7 @@ function SleepIcon({ className = 'h-8 w-8' }: { className?: string }) {
       <circle cx="20" cy="18" r="1" fill="#F5C842" opacity="0.5" />
       <circle cx="14" cy="24" r="0.8" fill="#F5C842" opacity="0.4" />
       <circle cx="24" cy="12" r="0.6" fill="#F5C842" opacity="0.3" />
-      <path d="M18 44c0-4 6-6 10-4s4 6 8 4-2-2-10-2-14 0" stroke="#7C3AED" strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
+      <path d="M18 44c0-4 6-6 10-4s4 6 8 4c4-2 2-2-10-2s-14 0-14 0" stroke="#7C3AED" strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
       <text x="32" y="55" textAnchor="middle" fill="#7C3AED" fontSize="10" opacity="0.4" fontFamily="sans-serif">z</text>
       <text x="40" y="52" textAnchor="middle" fill="#7C3AED" fontSize="7" opacity="0.3" fontFamily="sans-serif">z</text>
       <text x="24" y="52" textAnchor="middle" fill="#7C3AED" fontSize="8" opacity="0.25" fontFamily="sans-serif">z</text>
