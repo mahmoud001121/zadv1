@@ -60,6 +60,10 @@ export const TRANSLATIONS = {
     adhanNotifTitle: "حان الآن موعد صلاة {prayer}",
     adhanNotifBody: "حي على الصلاة، حي على الفلاح",
     eyeComfort: "وضع حماية العين",
+    salawatSound: "صوت الصلاة على النبي",
+    salawatInterval: "فترة التكرار",
+    salawatIntervalDesc: "المدة الزمنية بين كل صوت",
+    chooseSalawatInterval: "اختر الفترة الزمنية",
   },
   en: {
     home: "Home",
@@ -94,6 +98,10 @@ export const TRANSLATIONS = {
     pushNotifications: "Push Notifications",
     pushSubscribed: "You are subscribed to push notifications",
     pushNotSupported: "Your browser does not support push notifications",
+    salawatSound: "Salawat Sound",
+    salawatInterval: "Repeat Interval",
+    salawatIntervalDesc: "Time between each sound",
+    chooseSalawatInterval: "Choose Interval",
     pushDescription: "Get adhan alerts, prayer reminders, and daily dhikr directly on your device.",
     adhanNotifTitle: "It is now time for {prayer}",
     adhanNotifBody: "Hurry to prayer, hurry to success",
@@ -157,4 +165,5 @@ export const SALAWAT_INTERVALS = [
   { value: 10, nameEn: "Every 10 Minutes", nameAr: "كل 10 دقائق" },
   { value: 15, nameEn: "Every 15 Minutes", nameAr: "كل 15 دقيقة" },
   { value: 30, nameEn: "Every 30 Minutes", nameAr: "كل 30 دقيقة" },
+  { value: 60, nameEn: "Every 1 Hour", nameAr: "كل ساعة" },
 ];
